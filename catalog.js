@@ -106,10 +106,14 @@ window.CATALOG = {
       "controls": "Mouse and keyboard",
       "model": "Claude Fable 5.x",
       "effort": "ultracode",
-      "score": null,
-      "verdict": "",
-      "review": "",
-      "highlights": [],
+      "score": 7,
+      "verdict": "Impressive for its size. Primitive next to modern shooters.",
+      "review": "Impressive that we even have such a small, full-featured FPS in a browser, but it certainly looks very primitive compared to modern FPS games.",
+      "highlights": [
+        "Full-featured FPS in a browser",
+        "Small",
+        "Looks primitive next to modern FPS games"
+      ],
       "buildTime": "36h 7m",
       "agents": 197,
       "tokens": 9349363234,
