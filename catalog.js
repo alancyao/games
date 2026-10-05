@@ -21,6 +21,12 @@ window.CATALOG = {
       "name": "FPS",
       "short": "FPS",
       "brief": "Build a polished, browser-based first-person shooter campaign."
+    },
+    {
+      "id": "factory",
+      "name": "Factory builder",
+      "short": "Factory",
+      "brief": "Build a small Factorio-like factory-management game with defense, in which the factory is a software factory run by AI agents and play teaches its building blocks."
     }
   ],
   "games": [
@@ -309,6 +315,37 @@ window.CATALOG = {
         "poster": "./media/voidfront.jpg",
         "webm": "./media/voidfront.webm",
         "mp4": "./media/voidfront.mp4"
+      }
+    },
+    {
+      "id": "mainline",
+      "title": "Mainline",
+      "subtitle": "Ship clean. Hold the line.",
+      "genre": "factory",
+      "pitch": "Lay belts, boards and workers to turn requests into shipped software, and hold the line against slop.",
+      "controls": "Mouse and keyboard",
+      "model": "Claude Fable 5.x",
+      "effort": "ultracode",
+      "score": null,
+      "verdict": "",
+      "review": "",
+      "highlights": [],
+      "buildTime": "36h 5m",
+      "agents": 144,
+      "tokens": 4151835142,
+      "cost": 3080.72,
+      "costLabel": "$3,080.72 list-price equivalent",
+      "rates": "Claude Fable 5.1",
+      "notes": {
+        "build": "Wall clock from the task prompt to release, leaving out about 21 hours in which the build session was down: 36h 5m. The orchestrating session ran 16 agent workflows with 144 agents.",
+        "cost": "At Claude Fable 5.1 standard API list rates ($10 input, $12.50 cache write, $0.25 cache read and $50 output per million tokens) for 12,136 API messages: the orchestrating session plus 144 agents. Image generation for the game's pictures is not counted."
+      },
+      "accent": "#3fd6d0",
+      "url": "./mainline/",
+      "media": {
+        "poster": "./media/mainline.jpg",
+        "webm": "./media/mainline.webm",
+        "mp4": "./media/mainline.mp4"
       }
     }
   ]
