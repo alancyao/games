@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#071018" />
+    <meta name="description" content="Voidfront: a complete original browser real-time strategy game." />
+    <title>Voidfront — Browser RTS</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="game-shell" class="is-menu">
+      <canvas
+        id="game-canvas"
+        tabindex="0"
+        aria-label="Voidfront battlefield. Select units with the primary mouse button and issue contextual orders with the secondary mouse button."
+      ></canvas>
+
+      <div id="hud">
+        <header class="top-bar hud-panel">
+          <div class="brand-lockup" aria-label="Voidfront">
+            <span class="brand-mark">V</span>
+            <span class="brand-name">VOIDFRONT</span>
+          </div>
+          <div class="resource-strip">
+            <div class="resource readout" title="Lumen shards fund units and structures">
+              <span class="resource-icon shard-icon"></span>
+              <span id="shard-count">0</span>
+              <small>LUMEN</small>
+            </div>
+            <div class="resource readout" title="Active population and maximum relay capacity">
+              <span class="resource-icon supply-icon"></span>
+              <span><b id="supply-used">0</b>/<b id="supply-cap">0</b></span>
+              <small>UPLINK</small>
+            </div>
+          </div>
+          <section class="objective-strip" aria-label="Mission objective">
+            <span class="objective-kicker">PRIMARY DIRECTIVE</span>
+            <strong id="objective-text">Destroy the enemy Citadel</strong>
+            <div class="objective-progress"><i id="objective-progress-fill"></i></div>
+          </section>
+          <div class="top-controls">
+            <span id="game-clock" class="game-clock">00:00</span>
+            <button id="audio-button" class="icon-button" type="button" aria-label="Toggle sound" title="Toggle sound">◖</button>
+            <button id="help-button" class="icon-button" type="button" aria-label="Open field manual" title="Field manual (F1)">?</button>
+            <button id="pause-button" class="icon-button" type="button" aria-label="Pause game" title="Pause (P)">Ⅱ</button>
+          </div>
+        </header>
+
+        <section id="mission-card" class="mission-card hud-panel" aria-label="Field guidance">
+          <span class="mission-tag">FIELD LINK</span>
+          <strong id="mission-title">Establishing link…</strong>
+          <p id="mission-copy">Select a unit to begin.</p>
+          <div class="mission-meter"><i id="mission-meter-fill"></i></div>
+          <button id="dismiss-tutorial" type="button">Skip guidance</button>
+        </section>
+
+        <section id="alert-stack" class="alert-stack" aria-label="Battlefield alerts"></section>
+
+        <div id="target-mode" class="target-mode" hidden>
+          <span id="target-mode-label">SELECT TARGET</span>
+          <button id="cancel-target" type="button">CANCEL <kbd>ESC</kbd></button>
+        </div>
+
+        <footer class="command-deck hud-panel">
+          <section class="minimap-module" aria-label="Tactical minimap">
+            <div class="module-label"><span>TACTICAL MAP</span><b id="sector-label">SECTOR 7</b></div>
+            <canvas id="minimap" width="420" height="252" aria-label="Minimap. Click to move the camera."></canvas>
+            <div class="minimap-legend"><i class="legend-friendly"></i> ALLIED <i class="legend-hostile"></i> HOSTILE</div>
+          </section>
+
+          <section id="selection-panel" class="selection-panel" aria-label="Current selection">
+            <div id="selection-portrait" class="selection-portrait empty"><span>◇</span></div>
+            <div class="selection-copy">
+              <span id="selection-eyebrow" class="selection-eyebrow">NO SELECTION</span>
+              <h2 id="selection-name">Awaiting command</h2>
+              <p id="selection-description">Select allied units or structures on the battlefield.</p>
+              <div id="selection-health" class="selection-health" hidden>
+                <div><i id="selection-health-fill"></i></div>
+                <span id="selection-health-text">0 / 0</span>
+              </div>
+              <div id="production-queue" class="production-queue"></div>
+            </div>
+            <div id="unit-roster" class="unit-roster"></div>
+          </section>
+
+          <section class="actions-module" aria-label="Command actions">
+            <div class="module-label"><span>COMMAND GRID</span><b id="context-label">—</b></div>
+            <div id="action-grid" class="action-grid"></div>
+          </section>
+        </footer>
+
+        <div id="cursor-tooltip" class="cursor-tooltip" hidden></div>
+        <div id="toast-region" class="toast-region"></div>
+      </div>
+
+      <section id="start-screen" class="screen-overlay active" aria-labelledby="game-title">
+        <div class="stars"></div>
+        <div class="start-card">
+          <div class="start-emblem" aria-hidden="true"><i></i><b>V</b></div>
+          <span class="start-kicker">ORIGINAL BROWSER RTS</span>
+          <h1 id="game-title">VOIDFRONT</h1>
+          <p class="start-subtitle">THE ASHEN REACH</p>
+          <div class="briefing">
+            <span>MISSION 01 // LAST SIGNAL</span>
+            <p>
+              An enemy Citadel is consuming the last free sector. Harvest Lumen, establish a forward force,
+              and break the Citadel before its assault waves overwhelm your outpost.
+            </p>
+          </div>
+          <div class="difficulty-picker" role="group" aria-label="Select difficulty">
+            <button type="button" data-difficulty="recruit">
+              <span>RECRUIT</span><small>Relaxed assaults</small>
+            </button>
+            <button type="button" data-difficulty="standard" class="selected">
+              <span>STANDARD</span><small>Intended campaign</small>
+            </button>
+            <button type="button" data-difficulty="veteran">
+              <span>VETERAN</span><small>Fast, heavy waves</small>
+            </button>
+          </div>
+          <button id="launch-button" class="launch-button" type="button"><span>DEPLOY</span><kbd>ENTER</kbd></button>
+          <p class="start-controls">Mouse + keyboard recommended · Touch controls supported · No download required</p>
+        </div>
+        <div class="version-mark">VFR // BUILD 1.0</div>
+      </section>
+
+      <section id="pause-screen" class="screen-overlay pause-screen" aria-labelledby="pause-title">
+        <div class="pause-card hud-panel">
+          <span>TACTICAL LINK SUSPENDED</span>
+          <h2 id="pause-title">PAUSED</h2>
+          <button id="resume-button" class="launch-button" type="button">RESUME <kbd>P</kbd></button>
+          <button id="restart-button" class="secondary-button" type="button">Restart mission</button>
+          <button id="pause-help-button" class="secondary-button" type="button">Field manual</button>
+        </div>
+      </section>
+
+      <section id="end-screen" class="screen-overlay end-screen" aria-labelledby="end-title">
+        <div class="end-card">
+          <span id="end-kicker">MISSION COMPLETE</span>
+          <h2 id="end-title">SECTOR SECURED</h2>
+          <p id="end-copy">The Citadel has fallen.</p>
+          <div id="end-stats" class="end-stats"></div>
+          <button id="play-again-button" class="launch-button" type="button">PLAY AGAIN</button>
+        </div>
+      </section>
+
+      <dialog id="help-dialog">
+        <form method="dialog" class="manual">
+          <header>
+            <div><span>VFR FIELD ARCHIVE</span><h2>COMMAND MANUAL</h2></div>
+            <button aria-label="Close manual" value="close">×</button>
+          </header>
+          <div class="manual-grid">
+            <section>
+              <h3>Core loop</h3>
+              <p><b>1.</b> Send Surveyors to glowing Lumen formations.</p>
+              <p><b>2.</b> Add Relays for uplink capacity and Garrisons for infantry.</p>
+              <p><b>3.</b> Build a Foundry for Titans, then destroy the enemy Citadel.</p>
+            </section>
+            <section>
+              <h3>Selection</h3>
+              <p><kbd>Left click</kbd> Select one unit or structure</p>
+              <p><kbd>Drag</kbd> Select a group</p>
+              <p><kbd>Shift</kbd> Add or remove from selection</p>
+              <p><kbd>Double click</kbd> Select all visible units of that type</p>
+              <p><kbd>Ctrl + 1–9</kbd> Save group · <kbd>1–9</kbd> Recall</p>
+            </section>
+            <section>
+              <h3>Orders</h3>
+              <p><kbd>Right click</kbd> Move, attack, or harvest contextually</p>
+              <p><kbd>A</kbd> Attack-move · <kbd>M</kbd> Move</p>
+              <p><kbd>S</kbd> Stop · <kbd>H</kbd> Hold position</p>
+              <p><kbd>Esc</kbd> Cancel target or placement</p>
+            </section>
+            <section>
+              <h3>Camera</h3>
+              <p><kbd>Arrows</kbd> or edge scroll to pan the battlefield</p>
+              <p><kbd>Wheel</kbd> Zoom · <kbd>Middle drag</kbd> Pan</p>
+              <p><kbd>F</kbd> Center current selection</p>
+              <p><kbd>P</kbd> Pause · <kbd>F1</kbd> Manual</p>
+            </section>
+          </div>
+          <footer><span>Tip: combat units fire automatically at nearby threats.</span><button value="close">RETURN TO BATTLE</button></footer>
+        </form>
+      </dialog>
+
+      <div id="aria-status" class="sr-only" aria-live="polite"></div>
+    </main>
+
+    <script type="module" src="./src/game.js?v=6"></script>
+  </body>
+</html>

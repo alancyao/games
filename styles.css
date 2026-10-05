@@ -1,0 +1,3359 @@
+/* Arcade shelf: games catalog and bench.
+   System: warm paper, one ink, flat game accents. Boxes have thickness, buttons are keycaps,
+   every row of boxes stands on a board. Two colour signals, kept apart: the box colour is the
+   game's own accent; the block on a shelf label, a swatch or a bench bar is the model that built it. */
+
+@font-face {
+  font-family: "Unbounded";
+  src: url("./fonts/unbounded-latin-wght-normal.woff2") format("woff2");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Figtree";
+  src: url("./fonts/figtree-latin-wght-normal.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+/* Stand-ins while the two fonts load, scaled to their measure so text does not rewrap when they
+   arrive, and given their ascent and descent so lines do not move up or down either. Measured:
+   Unbounded 800 sets 1.32 times as wide as Arial Bold, Figtree 1.01 times Arial; Unbounded's
+   ascent and descent are 100% and 25% of its size, Figtree's 95% and 25%. */
+@font-face {
+  font-family: "Unbounded Fallback";
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold"),
+    local("Helvetica Bold"), local("Helvetica-Bold"), local("Roboto Bold"), local("Roboto-Bold");
+  font-weight: 200 900;
+  size-adjust: 132%;
+  ascent-override: 76%;
+  descent-override: 19%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Figtree Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("LiberationSans"), local("Helvetica"),
+    local("Roboto"), local("Roboto-Regular");
+  font-weight: 300 900;
+  size-adjust: 101%;
+  ascent-override: 94%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+}
+
+:root {
+  color-scheme: light;
+
+  /* palette */
+  --paper: #fff4df;
+  --paper-hi: #fffbf2;
+  --paper-lo: #f8e6c6;
+  --ink: #1f1a14;
+  --ink-soft: #5a4d3f;
+  --line: #e7cfa3;
+  --board-top: #f7dcae;
+  --board-lip: #ffeccb;
+  --board-front: #dcab68;
+  --board-edge: #c38f4a;
+  --board-shade: #efd9b0;
+  --accent: #f2cf99;
+  --on-accent: var(--ink);
+  --on-accent-text: var(--paper-hi);
+  --model: #8d7a5f;
+  --focus: var(--ink);
+
+  /* type */
+  --display: "Unbounded", "Unbounded Fallback", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+  --text: "Figtree", "Figtree Fallback", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --step--2: 0.75rem;
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: clamp(1.375rem, 1.1rem + 1vw, 1.75rem);
+  --step-3: clamp(1.625rem, 1.1rem + 2.2vw, 2.5rem);
+  --step-4: clamp(1.875rem, 1rem + 3.6vw, 3.5rem);
+
+  /* space: 4px base */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+  --s9: 96px;
+  --gutter: clamp(12px, 4vw, 48px);
+  --wrap: clamp(1320px, 72vw, 1900px);
+
+  /* shape */
+  --r-sm: 10px;
+  --r-md: 18px;
+  --r-lg: 28px;
+  --r-xl: 40px;
+  --edge: 2.5px;
+  --plank: 50px;
+
+  /* motion */
+  --quick: 120ms;
+  --move: 240ms;
+  --slow: 420ms;
+  --dwell: 10s;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html {
+  background: var(--paper);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 500 var(--step-0) / 1.5 var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* The dialog locks scrolling. The scrollbar's space is kept while it does, so on systems where the
+   scrollbar takes up room the page behind does not jump sideways. */
+html:has(dialog[open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.wrap {
+  width: min(var(--wrap), 100% - 2 * var(--gutter));
+  margin-inline: auto;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+}
+.icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.skip {
+  position: absolute;
+  left: var(--gutter);
+  top: -80px;
+  z-index: 20;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper-hi);
+  font-weight: 700;
+}
+.skip:focus {
+  top: 12px;
+}
+
+/* ---------- header ---------- */
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  padding-block: 14px 10px;
+}
+
+.brand {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s4);
+  min-width: 0;
+}
+.mark {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: var(--s3);
+  min-height: 44px;
+  padding-bottom: 8px;
+  text-decoration: none;
+  border-radius: var(--r-sm);
+}
+.mark-word {
+  font: 800 1.375rem/1 var(--display);
+  letter-spacing: -0.02em;
+}
+.mark-boxes {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  padding: 0 3px 5px;
+  border-bottom: 5px solid var(--ink);
+  border-radius: 0 0 3px 3px;
+  margin-bottom: -5px;
+}
+.mark-boxes i {
+  width: 9px;
+  height: 18px;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: transform var(--move) var(--spring);
+  transform-origin: 50% 100%;
+}
+.mark-boxes i:nth-child(2) {
+  height: 24px;
+}
+.mark-boxes i:nth-child(3) {
+  height: 15px;
+}
+.mark:hover .mark-boxes i:nth-child(2) {
+  transform: translateY(-4px);
+}
+.byline {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-bottom: 6px;
+  color: var(--ink-soft);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--board-front);
+  border-radius: 6px;
+}
+.byline:hover {
+  color: var(--ink);
+  text-decoration-color: var(--ink);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(2px, 1vw, 12px);
+  flex: none;
+}
+.nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 clamp(10px, 2.4vw, 16px);
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color var(--quick);
+}
+.nav a:hover {
+  background: var(--paper-lo);
+}
+.nav a[aria-current="page"] {
+  background: var(--ink);
+  color: var(--paper-hi);
+}
+@media (max-width: 560px) {
+  .top {
+    padding-block: 8px 4px;
+  }
+  .brand {
+    gap: var(--s2);
+  }
+  .mark {
+    gap: var(--s2);
+  }
+  .mark-word {
+    font-size: 1.125rem;
+  }
+  .byline {
+    font-size: 0.875rem;
+  }
+  .nav a {
+    font-size: 1rem;
+  }
+}
+/* Narrow phones have no room for the byline beside the nav. The catalog's first sentence carries the
+   link to Alan's page there instead, and the footer has it on both pages. */
+.lede-home {
+  display: none;
+}
+@media (max-width: 420px) {
+  .byline {
+    display: none;
+  }
+  .lede-home {
+    display: inline;
+    color: inherit;
+    font-weight: 700;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--board-front);
+  }
+  .lede-home:not([hidden]) + .lede-name {
+    display: none;
+  }
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 48px;
+  padding: 0 22px;
+  border: var(--edge) solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper-hi);
+  color: var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
+  font: 800 1rem/1.1 var(--text);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform var(--quick) var(--ease),
+    box-shadow var(--quick) var(--ease),
+    background-color var(--quick);
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--ink);
+}
+.btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.btn-solid {
+  background: var(--ink);
+  color: var(--paper-hi);
+  box-shadow: 0 4px 0 #8d7a5f;
+}
+.btn-solid:hover {
+  box-shadow: 0 6px 0 #8d7a5f;
+}
+.btn-solid:active {
+  box-shadow: 0 0 0 #8d7a5f;
+}
+/* Play takes the colour of the text on the box, so it has an edge on a dark box as well as a light one. */
+.btn-play {
+  border-color: var(--on-accent);
+  background: var(--on-accent);
+  color: var(--on-accent-text);
+  box-shadow: 0 4px 0 var(--btn-base, #8d7a5f);
+}
+.btn-play:hover {
+  box-shadow: 0 6px 0 var(--btn-base, #8d7a5f);
+}
+.btn-play:active {
+  box-shadow: 0 0 0 var(--btn-base, #8d7a5f);
+}
+.btn-play .icon {
+  transition: transform var(--move) var(--spring);
+}
+.btn-play:hover .icon {
+  transform: translateX(3px) scale(1.12);
+}
+.btn-lg {
+  min-height: 56px;
+  padding: 0 28px;
+  font-size: 1.125rem;
+}
+
+.textlink {
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
+  text-decoration-color: var(--board-front);
+  border-radius: 6px;
+  transition: text-decoration-color var(--quick);
+}
+.textlink:hover {
+  text-decoration-color: var(--ink);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  min-height: 26px;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: var(--on-accent);
+  color: var(--on-accent-text);
+  font: 800 0.75rem/1 var(--text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* The model that built a game: a small block that always sits beside the model's name. */
+.swatch {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  flex: none;
+  border-radius: 0.2em;
+  background: var(--model);
+}
+.swatch--striped {
+  background: repeating-linear-gradient(135deg, var(--model) 0 3px, var(--paper-hi) 3px 5px);
+  box-shadow: inset 0 0 0 1.5px var(--model);
+}
+
+/* ---------- rating sticker ---------- */
+
+.seal {
+  --size: 76px;
+  position: relative;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  width: var(--size);
+  height: var(--size);
+  flex: none;
+  color: var(--ink);
+  rotate: -8deg;
+  transition: rotate var(--move) var(--spring), scale var(--move) var(--spring);
+}
+.seal-shape {
+  position: absolute;
+  inset: 0;
+}
+.seal-shape svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 3px 0 rgba(31, 26, 20, 0.28));
+}
+.seal-shape path {
+  fill: var(--paper-hi);
+  stroke: var(--ink);
+  stroke-width: 3.2;
+  stroke-linejoin: round;
+}
+.seal-num,
+.seal-of {
+  position: relative;
+  font-family: var(--display);
+  line-height: 1;
+}
+.seal-num {
+  font-weight: 900;
+  font-size: calc(var(--size) * 0.4);
+  letter-spacing: -0.04em;
+}
+.seal--long .seal-num {
+  font-size: calc(var(--size) * 0.28);
+}
+.seal-of {
+  margin-top: 1px;
+  font-weight: 700;
+  font-size: max(0.75rem, calc(var(--size) * 0.16));
+}
+.seal--none {
+  width: auto;
+  height: auto;
+  padding: 7px 12px;
+  border: var(--edge) dashed var(--ink);
+  border-radius: 999px;
+  background: var(--paper-hi);
+  font: 800 0.8125rem/1 var(--text);
+  white-space: nowrap;
+  rotate: -4deg;
+}
+
+/* ---------- gameplay clip ---------- */
+
+.clip {
+  --focus: #fff;
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background: #15120f;
+  isolation: isolate;
+}
+.clip-link {
+  position: absolute;
+  inset: 0;
+  display: block;
+  outline-offset: -5px;
+}
+.clip-link video,
+.clip-poster,
+.clip-blank {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.clip-poster {
+  transition: opacity var(--move) linear;
+}
+.clip.is-playing .clip-poster {
+  opacity: 0;
+}
+/* The picture goes to the game; this says so when a pointer is on it. */
+.clip-link::after {
+  content: "Play";
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border: var(--edge) solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper-hi);
+  color: var(--ink);
+  font: 800 0.875rem/1 var(--text);
+  opacity: 0;
+  translate: 0 4px;
+  transition: opacity var(--quick), translate var(--quick) var(--ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .clip-link:hover::after {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.clip-toggle {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: var(--edge) solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper-hi);
+  color: var(--ink);
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform var(--quick) var(--ease), opacity var(--quick);
+}
+.clip-toggle:hover {
+  transform: scale(1.08);
+}
+.clip-toggle .when-playing,
+.clip.is-playing .clip-toggle .when-paused {
+  display: none;
+}
+.clip.is-playing .clip-toggle .when-playing {
+  display: inline-grid;
+}
+
+/* With a mouse a card's clip plays on hover, and with the Tab key on focus, so its button stays out
+   of the way and out of the tab order until the pointer is there. Touch and reduced motion always
+   show it. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .slot .clip-toggle {
+    visibility: hidden;
+    opacity: 0;
+  }
+  .slot:hover .clip-toggle {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+/* A game with no picture. */
+.blank {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(135deg, #2b251e 0 12px, #241f19 12px 24px);
+  color: #e9dcc4;
+  font: 900 1.125rem/1 var(--display);
+}
+.clip-blank {
+  font-size: clamp(2.5rem, 12vw, 4.5rem);
+}
+
+/* ---------- intro ---------- */
+
+.intro {
+  display: grid;
+  gap: var(--s2) var(--s8);
+  align-items: end;
+  padding-block: var(--s2) var(--s4);
+}
+.intro h1 {
+  font-size: clamp(1.3125rem, 0.95rem + 1.45vw, 1.75rem);
+  line-height: 1.12;
+}
+.intro-side {
+  max-width: 50ch;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+.intro-side .textlink {
+  color: var(--ink);
+}
+@media (min-width: 900px) {
+  .intro {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    padding-block: var(--s3) var(--s5);
+  }
+}
+@media (max-width: 560px) {
+  /* One short line under a smaller headline, so the clip starts higher and Play stays on the first
+     screen with the browser's bars showing. The header already links to the bench. */
+  .page-catalog .intro {
+    gap: 6px;
+    padding-block: var(--s1) 10px;
+  }
+  .page-catalog .intro h1 {
+    font-size: 1.1875rem;
+  }
+  .page-catalog .intro-side {
+    font-size: 0.9375rem;
+  }
+  .page-catalog .intro-more {
+    display: none;
+  }
+}
+
+/* ---------- the board every row stands on ---------- */
+
+.reel,
+.slot {
+  position: relative;
+  padding-bottom: 10px; /* the thickness of the box */
+}
+/* Each slot draws the full-width board under its own row; slots in a row overlap exactly. The box
+   overlaps the lit top face, so it stands on the board, not above it. */
+.reel::before,
+.slot::before {
+  content: "";
+  position: absolute;
+  top: calc(100% - 6px);
+  left: -100vw;
+  right: -100vw;
+  height: calc(var(--plank) + 16px);
+  background: linear-gradient(
+    to bottom,
+    var(--board-top) 0 10px,
+    var(--board-lip) 10px 13px,
+    var(--board-front) 13px calc(var(--plank) - 4px),
+    var(--board-edge) calc(var(--plank) - 4px) var(--plank),
+    var(--board-shade) var(--plank),
+    var(--paper) 100%
+  );
+}
+/* The shelf-edge ticket: who built the box above it, with a block in that model's colour. */
+.slot-label {
+  position: absolute;
+  z-index: 1;
+  top: calc(100% + 12px);
+  left: 14px;
+  max-width: calc(100% - 28px);
+  height: 30px;
+  padding: 0 11px 0 25px;
+  border-radius: 6px;
+  background: var(--paper-hi);
+  box-shadow: 0 2px 0 var(--board-edge);
+  color: var(--ink);
+  font: 600 0.9375rem/30px var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.slot-label b {
+  font-weight: 800;
+}
+.slot-label::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 16px;
+  background: var(--model);
+}
+.slot-label.is-striped::before {
+  background: repeating-linear-gradient(135deg, var(--model) 0 4px, var(--paper-hi) 4px 7px);
+}
+.slot-label--plain {
+  padding-left: 11px;
+  font-weight: 700;
+}
+.slot-label--plain::before {
+  display: none;
+}
+
+/* ---------- hero reel ---------- */
+
+/* The reel is the display unit on the top shelf. Its size is set here, before app.js runs. */
+.reel-wall {
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+.reel {
+  margin-bottom: var(--plank);
+}
+.kiosk {
+  --focus: var(--on-accent);
+  --deep: color-mix(in oklab, var(--accent) 72%, #3b1f00);
+  --btn-base: var(--deep);
+  --pad: clamp(8px, 1.2vw, 16px);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s3);
+  padding: var(--pad);
+  border-radius: clamp(26px, 4vw, 40px);
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 10px 0 var(--deep);
+  transition: background-color var(--slow) var(--ease), box-shadow var(--slow) var(--ease), color var(--slow) var(--ease);
+}
+.kiosk-screen {
+  position: relative;
+  min-width: 0;
+}
+.screen {
+  --focus: #fff;
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: calc(clamp(26px, 4vw, 40px) - var(--pad));
+  background: #15120f;
+  isolation: isolate;
+  touch-action: pan-y;
+}
+.screen .clip-slide {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+  border-radius: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--slow) linear, visibility 0s linear var(--slow);
+}
+.screen .clip-slide.is-on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--slow) linear;
+}
+/* The hero holds its last frame when paused; cards go back to the poster. */
+.screen .clip-slide.has-played .clip-poster {
+  opacity: 0;
+}
+.screen .clip-link::after {
+  right: 14px;
+  bottom: 14px;
+  height: 44px;
+  padding: 0 18px;
+  font-size: 1rem;
+}
+.screen .reel-toggle {
+  left: 14px;
+  bottom: 14px;
+  width: 48px;
+  height: 48px;
+}
+.reel-toggle .when-playing,
+.kiosk.is-running .reel-toggle .when-paused {
+  display: none;
+}
+.kiosk.is-running .reel-toggle .when-playing {
+  display: inline-grid;
+}
+.kiosk-hint {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  z-index: 3;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--paper-hi);
+  color: var(--ink);
+  font: 700 0.8125rem/1 var(--text);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--quick);
+}
+.kiosk:has(:focus-visible) .kiosk-hint {
+  opacity: 1;
+}
+
+/* Beside the picture: the rating as the one big read, with Alan's verdict as a pull quote. */
+.kiosk-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  min-width: 0;
+  min-height: var(--info-min, 0px);
+  padding: 2px clamp(6px, 1vw, 12px) clamp(6px, 0.8vw, 10px);
+  container: hero / inline-size;
+}
+.kiosk-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* Every game's panel sits in the same cell, so the cell is as tall as the tallest and the page
+   below does not move when the reel changes. */
+.panel {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+  visibility: hidden;
+}
+.panel.is-on {
+  visibility: visible;
+}
+/* The incoming panel's lines rise into place. A transition, not an animation: an animation here
+   restarts whenever a resize re-evaluates the panel's container queries. */
+.panel > * {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.panel.is-on > * {
+  opacity: 1;
+  transform: none;
+  transition: opacity var(--move) var(--ease), transform var(--move) var(--ease);
+}
+.panel.is-on > :nth-child(2) {
+  transition-delay: 30ms;
+}
+.panel.is-on > :nth-child(3) {
+  transition-delay: 60ms;
+}
+.panel.is-on > :nth-child(n + 4) {
+  transition-delay: 90ms;
+}
+.kiosk-kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+  font: 800 0.75rem/1.2 var(--text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.kiosk-title {
+  --title-max: 2.25rem;
+  max-width: 100%;
+  font-size: clamp(1.125rem, calc(100cqw / var(--fit, 8)), var(--title-max));
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+.kiosk-sub {
+  margin-top: -4px;
+  font-weight: 700;
+}
+.verdict {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  align-self: stretch;
+  gap: var(--s2) var(--s4);
+}
+.score {
+  display: flex;
+  align-items: baseline;
+  font: 900 clamp(4.5rem, 25cqw, 7rem) / 0.8 var(--display);
+  letter-spacing: -0.06em;
+}
+.score-of {
+  margin-left: 0.08em;
+  font-size: 0.26em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.score--long {
+  font-size: clamp(3rem, 16cqw, 4.5rem);
+}
+.score.score--none {
+  display: inline-block;
+  justify-self: start;
+  padding: 10px 16px;
+  border: var(--edge) dashed var(--on-accent);
+  border-radius: 999px;
+  font: 800 1.0625rem/1 var(--text);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.kiosk-verdict {
+  min-width: 0;
+}
+.kiosk-verdict p,
+p.kiosk-verdict {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+  font-weight: 700;
+  font-size: clamp(1rem, calc(1.55rem - var(--len, 60) * 0.006rem), 1.3125rem);
+  line-height: 1.25;
+  text-wrap: pretty;
+}
+.kiosk-verdict footer {
+  margin-top: 6px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+.kiosk-model {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  max-width: 100%;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.kiosk-model b {
+  font-weight: 800;
+}
+.kiosk-model .swatch {
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 0 0 2px var(--paper-hi);
+}
+/* One row always: a long title is cut short inside the Play button, never wrapped. */
+.kiosk-actions {
+  display: flex;
+  gap: var(--s3);
+  max-width: 100%;
+  padding-bottom: 4px;
+}
+.kiosk-actions .btn {
+  flex: none;
+}
+.kiosk-actions .btn-play {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.kiosk-actions .btn-play > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.picker {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 4), minmax(0, 104px));
+  gap: var(--s3); /* room for the focus ring between two thumbnails */
+  width: 100%;
+}
+.pick {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  padding: 0;
+  border: var(--edge) solid var(--on-accent);
+  border-radius: 12px;
+  background: #15120f;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--move) var(--spring);
+}
+.pick img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6;
+  transition: opacity var(--quick);
+}
+.pick:hover {
+  transform: translateY(-3px);
+}
+.pick:hover img,
+.pick[aria-current="true"] img {
+  opacity: 1;
+}
+.pick[aria-current="true"] {
+  box-shadow: 0 0 0 3px var(--accent), 0 0 0 6px var(--on-accent);
+}
+/* Only the current thumbnail takes keyboard focus, and it already wears a ring, so focus adds a
+   second ring outside the first. */
+.pick:focus-visible {
+  outline-offset: 8px;
+}
+.pick-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: rgba(255, 251, 242, 0.35);
+  opacity: 0;
+}
+.pick-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--paper-hi);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+.pick[aria-current="true"] .pick-bar {
+  opacity: 1;
+}
+/* The bar is the reel's timer. It stops while the reel is off screen, behind the dialog, or has the
+   pointer or keyboard focus on it. Focus left behind by a click does not count. */
+.kiosk.is-running .pick[aria-current="true"] .pick-bar::after {
+  animation: fill var(--dwell) linear forwards;
+}
+.kiosk.is-running.is-held .pick[aria-current="true"] .pick-bar::after,
+.kiosk.is-running:hover .pick[aria-current="true"] .pick-bar::after,
+.kiosk.is-running:has(:focus-visible) .pick[aria-current="true"] .pick-bar::after {
+  animation-play-state: paused;
+}
+@keyframes fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* The kicker stays on one line: a long genre name is cut short, the count is not. */
+.kiosk-kicker {
+  flex-wrap: nowrap;
+  max-width: 100%;
+}
+.kiosk-kicker .tag {
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  line-height: 26px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kiosk-kicker > span:not(.tag) {
+  flex: none;
+}
+/* The verdict takes whatever height is spare, so the space held open before app.js runs never
+   shows as a gap. */
+.panel > .verdict {
+  flex: 1 0 auto;
+  align-content: center;
+}
+
+/* Phones: one column, with Play on the first screen. */
+@media (max-width: 560px) {
+  .reel.wrap {
+    width: calc(100% - 16px);
+  }
+  .kiosk {
+    --pad: 8px;
+    gap: var(--s2);
+  }
+  .kiosk-info {
+    --info-min: 300px;
+    gap: 10px;
+    padding: 2px 8px 8px;
+  }
+  .panel {
+    gap: 8px;
+  }
+  .kiosk-kicker .tag {
+    min-height: 22px;
+    padding: 0 9px;
+    line-height: 22px;
+  }
+  .kiosk-title {
+    --title-max: 2rem;
+  }
+  .kiosk-sub,
+  .kiosk-verdict footer {
+    display: none;
+  }
+  .verdict {
+    gap: var(--s2) var(--s3);
+  }
+  .score {
+    font-size: clamp(4rem, 23cqw, 5.5rem);
+  }
+  .kiosk-verdict p,
+  p.kiosk-verdict {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    font-size: clamp(0.9375rem, calc(1.4rem - var(--len, 60) * 0.006rem), 1.125rem);
+  }
+  .kiosk-actions .btn {
+    min-height: 52px;
+    padding: 0 20px;
+    font-size: 1.0625rem;
+  }
+  .pick {
+    aspect-ratio: auto;
+    height: 46px;
+  }
+}
+@media (max-width: 359px) {
+  .kiosk-actions {
+    gap: var(--s2);
+  }
+  .kiosk-actions .btn {
+    padding: 0 12px;
+    font-size: 1rem;
+  }
+  /* The longest shelf label fits a 320px screen at this size. */
+  .slot-label {
+    font-size: 0.875rem;
+  }
+}
+/* Large phones and small tablets: still one column, with room for the subtitle. */
+@media (min-width: 561px) and (max-width: 639px) {
+  .kiosk-info {
+    --info-min: 392px;
+  }
+}
+
+/* Two columns in the panel: facts on the left; on the right the numeral with the verdict under it,
+   so the quote has the full width of its column. From 940px this arrangement is for tall windows
+   and for a phone on its side; a window of middling height gets the desktop arrangement below. */
+@media (min-width: 640px) and (max-width: 939px),
+  (min-width: 940px) and (max-width: 999px) and (max-height: 560px),
+  (min-width: 940px) and (max-width: 999px) and (min-height: 1000px) {
+  .kiosk-info {
+    --info-min: 316px;
+  }
+  .panel {
+    display: grid;
+    grid-template-columns: minmax(330px, 1fr) minmax(0, 1.25fr);
+    grid-template-rows: repeat(5, auto) 1fr;
+    justify-items: start;
+    gap: 10px var(--s6);
+  }
+  .panel > * {
+    grid-column: 1;
+  }
+  .panel > .kiosk-kicker {
+    grid-column: 1 / -1;
+  }
+  .panel > .verdict {
+    grid-column: 2;
+    grid-row: 2 / -1;
+    align-self: center;
+    justify-self: stretch;
+  }
+  .verdict {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s3);
+  }
+  .kiosk-verdict p,
+  p.kiosk-verdict {
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+  }
+  .kiosk-title {
+    font-size: clamp(1.125rem, calc(45cqw / var(--fit, 8)), var(--title-max));
+  }
+  .score {
+    font-size: clamp(4.5rem, 14cqw, 8rem);
+  }
+  .kiosk-actions .btn {
+    padding: 0 22px;
+    font-size: 1.0625rem;
+  }
+}
+/* A phone on its side: the clip is no taller than the screen, and the box is as wide as the clip. */
+@media (min-width: 640px) and (max-width: 999px) and (max-height: 560px) {
+  .kiosk {
+    max-width: calc((100vh - 24px) * 1.6 + 2 * var(--pad));
+    max-width: calc((100svh - 24px) * 1.6 + 2 * var(--pad));
+    margin-inline: auto;
+  }
+}
+
+/* A window too short for the clip with the panel under it: the box narrows until the title and Play
+   are on the first screen, down to the width it has in a 640px window. */
+@media (min-width: 640px) and (max-width: 939px) and (min-height: 561px) and (max-height: 999px) {
+  .kiosk {
+    max-width: max(589px, calc((100vh - 436px) * 1.6 + 2 * var(--pad)));
+    max-width: max(589px, calc((100svh - 436px) * 1.6 + 2 * var(--pad)));
+    margin-inline: auto;
+  }
+}
+
+/* Desktop: the picture takes about two thirds of the box and sets its height; the panel fills the
+   rest and is sized from that height, so text never changes the height of the hero. It starts at
+   940px in a window under 1000px tall, where the stacked arrangement would put Play below the first
+   screen.
+   The picture's height follows the window's. In a window 810px tall or more it is the height less
+   330px, which leaves the shelf heading on the first screen. A shorter window gives up the heading
+   first: the picture holds at 480px tall, then from 700px down it is the height less 220px, which
+   keeps the whole box on the first screen. */
+@media (min-width: 1000px), (min-width: 940px) and (min-height: 561px) and (max-height: 999px) {
+  .kiosk {
+    grid-template-columns: max(520px, min(100% - 344px, 68%, clamp(100vh - 330px, 480px, 100vh - 220px) * 1.6)) minmax(0, 1fr);
+    grid-template-columns: max(520px, min(100% - 344px, 68%, clamp(100svh - 330px, 480px, 100svh - 220px) * 1.6)) minmax(0, 1fr);
+    gap: clamp(14px, 1.8vw, 26px);
+  }
+  .kiosk-info {
+    container-type: size;
+    min-height: 0;
+    padding: 6px clamp(4px, 0.6vw, 10px) 4px 0;
+  }
+  /* The panel cannot grow here, so if a game's text is too long the verdict gives way and is cut
+     off rather than pushing the buttons over the thumbnails. */
+  .kiosk-stack {
+    overflow: clip;
+    overflow-clip-margin: 8px;
+  }
+  .panel > .verdict {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .kiosk-verdict p,
+  p.kiosk-verdict {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+  /* The two buttons scale with the panel, so Play and the title fit on one row in the narrowest
+     panel as well as the widest. */
+  .kiosk-actions .btn {
+    padding: 0 clamp(18px, 12cqw - 20px, 28px);
+    font-size: clamp(1rem, 5.2cqw, 1.125rem);
+  }
+}
+/* Tall panel: the numeral stands above the quote and grows with the box. Below 532px of height
+   there is no room for that stack, so the quote stays beside the numeral. */
+@container hero (min-height: 532px) and (max-width: 559px) {
+  .panel {
+    gap: var(--s3);
+  }
+  .kiosk-title {
+    --title-max: 2.75rem;
+  }
+  .verdict {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s3);
+  }
+  .score {
+    font-size: min(27cqh, 56cqw);
+  }
+  .score--long {
+    font-size: min(17cqh, 34cqw);
+  }
+  .kiosk-verdict p,
+  p.kiosk-verdict {
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    font-size: clamp(1.0625rem, calc(1.9rem - var(--len, 60) * 0.007rem), 1.625rem);
+    line-height: 1.22;
+  }
+  .kiosk-verdict footer {
+    font-size: 0.875rem;
+  }
+}
+/* Wide panel (a short desktop window, where the picture is held small by the window's height): two
+   columns centred in the panel's height. Facts on the left; on the right the numeral with the
+   verdict under it. */
+@container hero (min-width: 560px) and (min-height: 1px) {
+  .panel {
+    display: grid;
+    grid-template-columns: minmax(340px, 1fr) minmax(0, 1fr);
+    grid-template-rows: repeat(5, auto);
+    align-content: center;
+    justify-items: start;
+    gap: 10px var(--s6);
+  }
+  .panel > * {
+    grid-column: 1;
+  }
+  .panel > .verdict {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    justify-self: stretch;
+  }
+  .verdict {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s3);
+  }
+  .kiosk-title {
+    font-size: clamp(1.125rem, calc(45cqw / var(--fit, 8)), var(--title-max));
+  }
+  .score {
+    font-size: clamp(4.5rem, min(14cqw, 30cqh), 8rem);
+  }
+  .score--long {
+    font-size: clamp(3rem, min(9cqw, 20cqh), 5rem);
+  }
+  .kiosk-verdict p,
+  p.kiosk-verdict {
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+  }
+  .kiosk-actions .btn {
+    padding: 0 24px;
+    font-size: 1.0625rem;
+  }
+}
+/* Wide and tall (a very wide window): the same two columns with larger type. */
+@container hero (min-width: 560px) and (min-height: 480px) {
+  .panel {
+    gap: var(--s3) var(--s7);
+  }
+  .kiosk-title {
+    --title-max: 2.75rem;
+  }
+  .score {
+    font-size: clamp(4.5rem, min(16cqw, 30cqh), 9.5rem);
+  }
+  .kiosk-verdict p,
+  p.kiosk-verdict {
+    font-size: clamp(1.0625rem, calc(1.9rem - var(--len, 60) * 0.007rem), 1.625rem);
+    line-height: 1.22;
+  }
+}
+/* Short panel. */
+@container hero (max-height: 400px) {
+  .kiosk-sub {
+    display: none;
+  }
+  .panel {
+    gap: 8px;
+  }
+  .kiosk-kicker > span:not(.tag) {
+    display: none;
+  }
+  .pick {
+    aspect-ratio: auto;
+    height: 44px;
+  }
+  .kiosk-actions .btn {
+    min-height: 48px;
+  }
+}
+/* The shortest narrow panel has no line to spare for the quote's caption. */
+@container hero (max-height: 340px) and (max-width: 559px) {
+  .kiosk-verdict footer {
+    display: none;
+  }
+}
+
+/* ---------- the shelf ---------- */
+
+.catalog {
+  padding-top: var(--s6);
+}
+.shelf-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s4);
+  padding-bottom: var(--s6);
+}
+.shelf-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s1) var(--s5);
+}
+.shelf-title h2 {
+  font-size: var(--step-3);
+}
+.shelf-title h2:focus {
+  outline: none;
+}
+.shelf-status {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.shelf-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  min-width: 0;
+  padding-bottom: 4px;
+}
+.chip {
+  position: relative; /* keeps its hidden screen-reader text inside the scrolling row on phones */
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 9px 0 18px;
+  border: var(--edge) solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper-hi);
+  box-shadow: 0 4px 0 var(--ink);
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--quick) var(--ease),
+    box-shadow var(--quick) var(--ease),
+    background-color var(--quick);
+}
+.chip > span:first-child,
+.legend-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--ink);
+}
+.chip:active,
+.chip[aria-pressed="true"] {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.chip[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper-hi);
+}
+.chip-count {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--paper-lo);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+.chip[aria-pressed="true"] .chip-count {
+  background: var(--paper-hi);
+}
+
+/* The key to the label colours, which also filters by model. Flatter than the genre chips. */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+}
+.legend-label {
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.legend-note {
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.chips--model {
+  gap: var(--s2);
+  padding-bottom: 0;
+}
+.chip--model {
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 6px 0 12px;
+  border-width: 2px;
+  box-shadow: none;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+.chip--model .swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+.chip--model:hover {
+  transform: none;
+  box-shadow: none;
+  background: var(--paper-lo);
+}
+.chip--model:active,
+.chip--model[aria-pressed="true"] {
+  transform: none;
+  box-shadow: none;
+}
+.chip--model[aria-pressed="true"] {
+  background: var(--ink);
+}
+.chip--model[aria-pressed="true"] .swatch {
+  box-shadow: 0 0 0 2px var(--paper-hi);
+}
+.chip--model .chip-count {
+  min-width: 24px;
+  height: 24px;
+  font-size: 0.8125rem;
+}
+
+.sorter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  min-width: 0;
+  max-width: 100%;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.sorter select {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  min-height: 48px;
+  padding: 0 44px 0 18px;
+  border: var(--edge) solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper-hi)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1.5 1.5L6 6l4.5-4.5' fill='none' stroke='%231F1A14' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    no-repeat right 18px center / 12px 8px;
+  color: var(--ink);
+  font-weight: 800;
+  appearance: none;
+  cursor: pointer;
+}
+@media (max-width: 560px) {
+  .catalog {
+    padding-top: var(--s5);
+  }
+  .shelf-head {
+    gap: var(--s3);
+    padding-bottom: var(--s5);
+  }
+  .shelf-status {
+    font-size: 0.9375rem;
+  }
+  .chips {
+    gap: 10px 8px;
+  }
+  .chip {
+    min-height: 44px;
+    gap: 8px;
+    padding: 0 7px 0 14px;
+    font-size: 0.9375rem;
+  }
+  .chip-count {
+    min-width: 26px;
+    height: 26px;
+    font-size: 0.8125rem;
+  }
+  .legend-note {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* The model key is a grid, two to a row on most phones, so every model's colour is in view. */
+  .legend {
+    gap: var(--s2);
+  }
+  .legend-label {
+    flex: 1 0 100%;
+    font-size: 0.9375rem;
+  }
+  .chips--model {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+    flex: 1 1 100%;
+    gap: 6px;
+  }
+  .chip--model {
+    min-height: 44px;
+    padding: 0 6px 0 9px;
+    gap: 6px;
+    font-size: 0.875rem;
+    line-height: 1.15;
+  }
+  .chip--model .swatch {
+    width: 12px;
+    height: 12px;
+  }
+  .chip--model .chip-count {
+    min-width: 22px;
+    height: 22px;
+    margin-left: auto;
+    padding: 0 6px;
+  }
+  .sorter select {
+    min-height: 44px;
+  }
+}
+
+.shelf-wall {
+  overflow-x: hidden;
+  overflow-x: clip;
+  padding-top: 22px; /* room for stickers and lifted boxes */
+}
+/* Until the scripts have filled the shelf or the table, hold a screen of space for them, so what
+   comes after does not start on screen and then get pushed down. */
+html:not(.js) .shelf-wall,
+html:not(.js) .sheet {
+  min-height: 100vh;
+}
+html:not(.js) .sheet-note {
+  visibility: hidden;
+}
+.shelf {
+  --gap: clamp(16px, 2.4vw, 32px);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+  gap: calc(var(--plank) + var(--s7)) var(--gap);
+  padding-bottom: calc(var(--plank) + var(--s6));
+}
+/* Two boxes to a row from 600px, where one row of one box would be more than 500px wide. */
+@media (min-width: 600px) and (max-width: 767px) {
+  .shelf {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1100px) {
+  .shelf {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 2200px) {
+  .shelf {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .shelf {
+    gap: calc(var(--plank) + var(--s4)) var(--gap);
+  }
+}
+.slot {
+  --deep: color-mix(in oklab, var(--accent) 72%, #3b1f00);
+  --btn-base: var(--deep);
+  display: flex;
+  min-width: 0;
+}
+
+.box {
+  --focus: var(--on-accent);
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: 12px;
+  border-radius: var(--r-lg);
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 10px 0 var(--deep);
+  transform-origin: 50% 100%;
+  transition: transform var(--move) var(--spring);
+}
+.box-seal {
+  position: absolute;
+  top: -18px;
+  right: -8px;
+  z-index: 3;
+  pointer-events: none;
+}
+.box-seal .seal--none {
+  margin: 10px 16px 0 0;
+}
+.box-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s2);
+  min-width: 0;
+  padding: var(--s4) var(--s2) var(--s2);
+  container-type: inline-size;
+}
+.box-top {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: var(--s2);
+  width: 100%;
+  min-width: 0;
+}
+.box-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s2) 10px;
+  max-width: 100%;
+  min-width: 0;
+}
+.box-sub {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+.box-title {
+  max-width: 100%;
+  font-size: clamp(1rem, calc(100cqw / var(--word, 8)), 1.625rem);
+  letter-spacing: -0.03em;
+}
+/* Room for every shipped pitch in full. A longer one ends on a whole word (wordFit in app.js). */
+.box-pitch {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+.box-verdict {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-weight: 800;
+  line-height: 1.3;
+}
+/* Phones: title and genre share a row, and a rated game shows the verdict in place of the pitch. */
+@media (max-width: 560px) {
+  .box-top {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 10px;
+  }
+  .box-sub,
+  .box.has-verdict .box-pitch {
+    display: none;
+  }
+}
+/* Shown when the shelf is sorted by build time or cost, so the order makes sense. */
+.box-fact {
+  padding: 5px 11px;
+  border: 2px solid var(--on-accent);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+.box-fact b {
+  font-weight: 800;
+}
+.box-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  width: 100%;
+  margin-top: auto;
+  padding-top: var(--s3);
+}
+.box-actions .btn-play {
+  flex: 1 1 auto;
+}
+
+/* The box lifts under the pointer and under keyboard focus, not under focus a click left behind. */
+@media (hover: hover) and (pointer: fine) {
+  .slot:hover .box,
+  .slot:has(:focus-visible) .box {
+    transform: translateY(-10px) rotate(-0.7deg);
+  }
+  .slot:hover .seal,
+  .slot:has(:focus-visible) .seal {
+    rotate: 6deg;
+    scale: 1.08;
+  }
+}
+
+/* First paint: the boxes drop onto their shelves one after another. */
+.shelf.is-stocking .box {
+  animation: drop 460ms var(--spring) backwards;
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+@keyframes drop {
+  from {
+    opacity: 0;
+    transform: translateY(-26px) rotate(-1.6deg);
+  }
+}
+
+/* The last box on the shelf is the bench. */
+.slot--bench,
+.slot--empty {
+  --accent: var(--paper-hi);
+  --on-accent: var(--ink);
+  --on-accent-text: var(--paper-hi);
+  --deep: var(--ink);
+}
+.slot--bench .box,
+.slot--empty .box {
+  border: var(--edge) solid var(--ink);
+  justify-content: space-between;
+  gap: var(--s5);
+  padding: var(--s5);
+}
+.slot--empty .box {
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--s3);
+  border-style: dashed;
+  box-shadow: none;
+}
+.slot--empty::before {
+  display: none;
+}
+.slot--empty h3 {
+  font-size: 1.375rem;
+}
+.slot--empty p {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.bench-bars {
+  display: grid;
+  gap: 7px;
+  padding: var(--s4);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.bench-bars i {
+  display: block;
+  height: 14px;
+  min-width: 14px;
+  width: calc(var(--v) * 100%);
+  border-radius: 5px;
+  background: var(--model);
+}
+.bench-bars i.is-striped {
+  background: repeating-linear-gradient(135deg, var(--model) 0 4px, var(--paper) 4px 7px);
+}
+.bench-bars i.is-none {
+  width: 14px;
+  background: none;
+  border: 2px dashed var(--ink-soft);
+}
+.slot--bench h3 {
+  font-size: 1.5rem;
+}
+.slot--bench .box p {
+  margin-top: var(--s2);
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.slot--bench .btn {
+  align-self: flex-start;
+}
+
+/* ---------- what this is ---------- */
+
+.about {
+  padding-block: var(--s7);
+}
+.about-card {
+  display: grid;
+  gap: var(--s5) var(--s8);
+  padding: clamp(20px, 4vw, 48px);
+  border-radius: clamp(26px, 4vw, 40px);
+  background: var(--paper-lo);
+}
+.about-card h2 {
+  margin-bottom: var(--s3);
+  font-size: var(--step-2);
+}
+.about-card p {
+  max-width: 52ch;
+  margin-bottom: var(--s4);
+}
+.tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+}
+.tally li {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 88px;
+  padding: var(--s4) var(--s4) var(--s3);
+  border-radius: var(--r-md);
+  background: var(--paper-hi);
+}
+.tally b {
+  font: 800 var(--step-3) / 1 var(--display);
+  letter-spacing: -0.04em;
+}
+.tally span {
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+@media (min-width: 900px) {
+  .about-card {
+    grid-template-columns: 1.2fr 1fr;
+    align-items: center;
+  }
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3) var(--s5);
+  padding-block: var(--s5) var(--s7);
+  border-top: var(--edge) solid var(--line);
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.foot nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s5);
+}
+.foot a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  font-weight: 800;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+  border-radius: 6px;
+}
+
+.noscript {
+  margin-block: var(--s5);
+  padding: var(--s5);
+  border-radius: var(--r-md);
+  background: var(--paper-lo);
+  font-weight: 700;
+}
+
+/* ---------- details: the back of the box ---------- */
+
+.back {
+  --deep: color-mix(in oklab, var(--accent) 72%, #3b1f00);
+  width: min(1040px, 100% - 32px);
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-xl);
+  background: var(--paper-hi);
+  color: var(--ink);
+  box-shadow: 0 12px 0 var(--deep);
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+}
+.back::backdrop {
+  background: rgba(54, 40, 22, 0.62);
+}
+.back[open] {
+  animation: lift var(--move) var(--ease);
+}
+.back[open]::backdrop {
+  animation: fade var(--move) linear;
+}
+@keyframes lift {
+  from {
+    opacity: 0;
+    transform: translateY(24px) rotate(-1deg) scale(0.97);
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.back-head {
+  --focus: var(--on-accent);
+  --btn-base: var(--deep);
+  position: relative;
+  display: grid;
+  gap: var(--s4) var(--s5);
+  padding: clamp(12px, 2vw, 22px);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+/* Close stays in the corner while the sheet scrolls. */
+.back-close {
+  position: sticky;
+  top: 12px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin: 12px 12px -58px auto;
+  padding: 0;
+  border: var(--edge) solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper-hi);
+  color: var(--ink);
+  box-shadow: 0 3px 0 var(--ink);
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform var(--quick) var(--ease), box-shadow var(--quick) var(--ease);
+}
+.back-close:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 var(--ink);
+}
+.back-close:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.back-close:focus-visible {
+  outline-color: var(--ink);
+  box-shadow: 0 0 0 3px var(--paper-hi), 0 3px 0 3px var(--ink);
+}
+.back-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s3);
+  min-width: 0;
+  padding: var(--s2) var(--s2) var(--s2) 0;
+  container-type: inline-size;
+}
+.back-title h2 {
+  max-width: 100%;
+  font-size: clamp(1.125rem, calc((100cqw - 56px) / var(--word, 8)), var(--step-3));
+  letter-spacing: -0.03em;
+  padding-right: 56px;
+}
+.back-title h2:focus {
+  outline: none;
+}
+.back-sub {
+  margin-top: -6px;
+  font-size: var(--step-1);
+  font-weight: 700;
+}
+.back-pitch {
+  font-weight: 600;
+  max-width: 44ch;
+}
+.back-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  font-weight: 700;
+}
+.back-rating .seal {
+  --size: 84px;
+}
+.back-rating .seal--none {
+  font-size: 0.9375rem;
+  padding: 9px 14px;
+}
+.back-title .btn {
+  max-width: 100%;
+  margin-top: auto;
+  white-space: normal;
+}
+
+.back-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s6) var(--s7);
+  padding: clamp(20px, 3.4vw, 40px);
+}
+.back-body h3 {
+  margin-bottom: var(--s3);
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+}
+.back-verdict {
+  font: 700 var(--step-2) / 1.25 var(--text);
+  text-wrap: balance;
+}
+.back-review {
+  margin-top: var(--s4);
+  max-width: 60ch;
+}
+.back-empty {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: var(--s5);
+}
+.marks li {
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: var(--paper-lo);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  line-height: 1.2;
+}
+.back-controls {
+  margin-top: var(--s5);
+}
+.back-controls p {
+  font-weight: 700;
+}
+.facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  border: var(--edge) solid var(--ink);
+}
+.facts dt,
+.facts dd {
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--line);
+}
+.facts dt {
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+.facts dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.facts dd .swatch {
+  align-self: center;
+}
+.facts dd small {
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.facts dt:last-of-type,
+.facts dd:last-of-type {
+  border-bottom: 0;
+}
+/* How the figures were measured, always in view. */
+.facts-notes {
+  margin-top: var(--s4);
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+.facts-notes h4 {
+  margin-bottom: var(--s1);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+.facts-notes p {
+  overflow-wrap: anywhere;
+}
+.facts-notes p + p {
+  margin-top: var(--s2);
+}
+.facts-notes b {
+  color: var(--ink);
+  font-weight: 800;
+}
+/* Previous and next stay at the foot of the sheet while it scrolls. A long title is cut short, so
+   the bar is always one row. */
+.back-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: 10px clamp(20px, 3.4vw, 40px) 14px;
+  border-top: 2px solid var(--line);
+  background: var(--paper-hi);
+}
+.back-foot .btn {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 0 18px;
+  box-shadow: 0 3px 0 var(--ink);
+}
+.back-foot .btn:hover {
+  box-shadow: 0 5px 0 var(--ink);
+}
+.back-foot .btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.step-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.back-foot .step-next {
+  margin-left: auto;
+}
+/* One game in view: nothing to step to, so no bar. */
+.back-foot:not(:has(button)) {
+  display: none;
+}
+
+@media (min-width: 820px) {
+  .back-head {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+  .back-body {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+}
+/* A wide, short window (a phone on its side): the pane is too short to give up a row, so previous
+   and next go back to the end of the sheet. */
+@media (min-width: 601px) and (max-height: 480px) {
+  .back-foot {
+    position: static;
+  }
+}
+/* Phones: a sheet that rises from the bottom and leaves the page showing above it. */
+@media (max-width: 600px) {
+  .back {
+    width: 100%;
+    max-height: calc(100dvh - 56px);
+    margin: auto 0 0;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    box-shadow: none;
+  }
+  .back-title {
+    padding: 0 var(--s1) var(--s1);
+  }
+  .back-title h2 {
+    padding-right: 0;
+    font-size: clamp(1.125rem, calc(100cqw / var(--word, 8)), var(--step-3));
+  }
+  .back-rating .seal {
+    --size: 76px;
+  }
+  /* Close sits in the bar at the foot of the sheet, between previous and next, so it covers neither
+     the picture nor the text while the sheet scrolls. It is still the first control in the sheet. */
+  .back-close {
+    top: calc(100% - 59px);
+    margin: 0 auto -46px;
+  }
+  .back-foot,
+  .back-foot:not(:has(button)) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr);
+    min-height: 70px;
+    padding-inline: var(--s3);
+  }
+  .back-foot .btn {
+    padding: 0 14px;
+  }
+  .back-foot .step-prev {
+    grid-column: 1;
+    justify-self: start;
+  }
+  .back-foot .step-next {
+    grid-column: 3;
+    justify-self: end;
+    margin-left: 0;
+  }
+}
+
+/* ================= bench ================= */
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s2) var(--s5);
+  margin-bottom: var(--s5);
+}
+.section-head h2 {
+  font-size: var(--step-3);
+}
+.section-head p {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.page-bench .intro {
+  align-items: center;
+}
+.page-bench .intro h1 {
+  font-size: var(--step-4);
+}
+
+/* One line of counts above the table. */
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) clamp(14px, 3vw, 32px);
+  min-height: calc(1.5em + var(--s4)); /* one line, held open until bench.js fills it */
+  padding: 0 var(--s1) var(--s4);
+  color: var(--ink-soft);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.strip b {
+  color: var(--ink);
+  font: 800 1.375rem/1 var(--display);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 420px) {
+  .strip {
+    justify-content: space-between;
+    gap: var(--s1) var(--s2);
+    font-size: 0.875rem;
+  }
+  .strip b {
+    font-size: 1.125rem;
+  }
+}
+
+.sheet {
+  padding: clamp(12px, 2vw, 24px);
+  border-radius: clamp(24px, 4vw, 40px);
+  background: var(--paper-hi);
+  box-shadow: 0 10px 0 var(--board-front);
+  container: sheet / inline-size;
+}
+.sheet-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3) var(--s5);
+  padding: var(--s2) var(--s2) var(--s3);
+}
+.sheet-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s1) var(--s4);
+}
+.sheet-head h2 {
+  font-size: var(--step-2);
+}
+.sheet-head h2:focus {
+  outline: none;
+}
+.sheet-status {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.sheet-note {
+  padding: var(--s4) var(--s2) var(--s1);
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s1) var(--s4);
+  padding: 0 var(--s2) var(--s4);
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+.key ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s4);
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+}
+
+/* Fixed column widths: the table always fits its sheet, whatever the data says. */
+.bench {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+.bench thead .c-score {
+  width: 6.8%;
+}
+.bench thead .c-title {
+  width: 23%;
+}
+/* Room for the longest genre name on one line ("StarCraft-inspired RTS"). The narrower tables below
+   give it two lines, broken between words, and the narrowest shows the short name. */
+.bench thead .c-genre {
+  width: 13.8%;
+}
+.bench thead .c-model {
+  width: 13%;
+}
+.bench thead .c-effort {
+  width: 8.5%;
+}
+.bench thead .c-buildTime {
+  width: 9%;
+}
+/* Each of these is wider than its header button at the narrowest table that uses these widths. */
+.bench thead .c-agents {
+  width: 7.2%;
+}
+.bench thead .c-tokens {
+  width: 7.2%;
+}
+/* Wide enough for "list-price equivalent" on one line, so the header row is one height in the
+   stand-in font and the real one. */
+.bench thead .c-cost {
+  width: 11.5%;
+}
+.bench th,
+.bench td {
+  padding: 11px 8px;
+  text-align: left;
+  vertical-align: middle;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.bench thead th {
+  padding: 0 2px 8px;
+  border-bottom: var(--edge) solid var(--ink);
+  vertical-align: bottom;
+  overflow-wrap: normal;
+}
+.bench tbody th,
+.bench tbody td {
+  border-bottom: 2px solid var(--line);
+}
+.bench tbody tr:last-child th,
+.bench tbody tr:last-child td {
+  border-bottom: 0;
+}
+.bench tbody tr:hover > * {
+  background: var(--paper);
+}
+/* The sorted column is shaded from header to last row. */
+.bench tbody .is-sorted,
+.bench tbody tr:hover > .is-sorted {
+  background: var(--paper-lo);
+}
+.bench .num {
+  text-align: right;
+}
+.bench tbody .num {
+  white-space: nowrap;
+}
+
+.th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  font-weight: 800;
+  text-align: inherit;
+  line-height: 1.15;
+  cursor: pointer;
+  transition: background-color var(--quick);
+}
+.th-sort small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.th-sort:hover {
+  background: var(--paper-lo);
+}
+.th-sort .icon {
+  width: 10px;
+  height: 14px;
+}
+.th-sort .icon path {
+  fill: #cdb68d;
+}
+th[aria-sort="ascending"] .th-sort,
+th[aria-sort="descending"] .th-sort {
+  background: var(--ink);
+  color: var(--paper-hi);
+}
+th[aria-sort="ascending"] .th-sort small,
+th[aria-sort="descending"] .th-sort small {
+  color: var(--paper-hi);
+}
+th[aria-sort="ascending"] .th-sort .icon path,
+th[aria-sort="descending"] .th-sort .icon path {
+  fill: #6f6252;
+}
+th[aria-sort="ascending"] .th-sort .icon .up,
+th[aria-sort="descending"] .th-sort .icon .down {
+  fill: var(--paper-hi);
+}
+
+.bench .seal {
+  --size: 58px;
+  rotate: -6deg;
+}
+.bench .seal-num {
+  font-size: calc(var(--size) * 0.36);
+}
+.bench .seal--long .seal-num {
+  font-size: calc(var(--size) * 0.26);
+}
+.bench .seal--none {
+  padding: 6px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  line-height: 1.15;
+  text-align: center;
+  white-space: normal;
+  rotate: -3deg;
+}
+.game {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  min-width: 0;
+}
+.thumb {
+  width: 72px;
+  height: 46px;
+  flex: none;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #15120f;
+  overflow: hidden;
+}
+.game-name {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  flex: 1;
+  container-type: inline-size;
+}
+/* A long word in a title gets smaller type, and the row gives up its thumbnail and the space beside
+   Play (see .game.is-long further down), before it breaks. */
+.game.is-long .thumb {
+  display: none;
+}
+.game-name a {
+  font: 800 clamp(0.75rem, calc(100cqw / var(--word, 8)), 1.0625rem) / 1.15 var(--display);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  border-radius: 4px;
+}
+.game-name a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.game-name small {
+  margin-top: 3px;
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.row-play {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper-hi);
+  font-size: 16px;
+  text-decoration: none;
+  transition: transform var(--quick) var(--ease);
+}
+.row-play:hover {
+  transform: scale(1.1);
+}
+.row-play-label {
+  display: none;
+}
+.model {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  min-width: 0;
+}
+.model .swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  translate: 0 1px;
+}
+.exact {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.abbr {
+  cursor: help;
+}
+
+/* Size bar: this figure against the largest in its column, in the colour of the model. */
+.meter {
+  display: block;
+  height: 6px;
+  margin-top: 6px;
+  min-width: 48px;
+  border-radius: 3px;
+  background: var(--paper-lo);
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+.meter i {
+  display: block;
+  width: max(3px, var(--v) * 100%);
+  height: 100%;
+  border-radius: 3px;
+  background: var(--model);
+}
+tr.is-striped .meter i {
+  background: repeating-linear-gradient(135deg, var(--model) 0 4px, var(--paper-hi) 4px 6px);
+}
+.bench .is-sorted .meter {
+  background: var(--paper-hi);
+}
+
+.sheet-sorter {
+  display: none;
+}
+
+/* The genre's short name, shown in place of the full one where a layout says so. */
+.genre-brief {
+  display: none;
+}
+
+/* A long word in a title has the whole width of the cell: Play drops to the line below, beside the
+   subtitle. The cell is then the box the title is sized against. */
+@container sheet (min-width: 860px) {
+  .game.is-long {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px var(--s2);
+    container-type: inline-size;
+  }
+  .game.is-long .game-name {
+    display: contents;
+    container-type: normal;
+  }
+  .game.is-long .game-name a {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  .game.is-long .game-name small {
+    margin-top: 0;
+  }
+  .game.is-long .row-play {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+/* A table a little narrower than the widest: the genre name takes two lines. */
+@container sheet (max-width: 1263px) {
+  .bench thead .c-score {
+    width: 7%;
+  }
+  .bench thead .c-genre {
+    width: 12.5%;
+  }
+  .bench thead .c-agents {
+    width: 7.5%;
+  }
+  .bench thead .c-tokens {
+    width: 7.5%;
+  }
+  .bench thead .c-cost {
+    width: 12%;
+  }
+}
+
+/* Tablet widths: the table stays a table and gives up its thumbnails. */
+@container sheet (max-width: 1139px) {
+  .bench {
+    font-size: 0.875rem;
+  }
+  .bench thead .c-score {
+    width: 7.5%;
+  }
+  .bench thead .c-title {
+    width: 21.3%;
+  }
+  .bench thead .c-genre {
+    width: 13.2%;
+  }
+  .bench thead .c-model {
+    width: 12.5%;
+  }
+  .bench thead .c-effort {
+    width: 9.5%;
+  }
+  .bench thead .c-buildTime {
+    width: 9%;
+  }
+  .bench thead .c-agents {
+    width: 7.5%;
+  }
+  .bench thead .c-tokens {
+    width: 7.5%;
+  }
+  .bench thead .c-cost {
+    width: 12%;
+  }
+  .thumb {
+    display: none;
+  }
+  .bench th,
+  .bench td {
+    padding-inline: 6px;
+  }
+  .th-sort {
+    gap: 3px;
+    padding-inline: 3px;
+  }
+  .c-score .th-sort small {
+    display: none;
+  }
+  .game {
+    gap: var(--s2);
+  }
+  .game-name a {
+    font-size: clamp(0.75rem, calc(100cqw / var(--word, 8)), 0.9375rem);
+  }
+  .bench .seal {
+    --size: 54px;
+  }
+}
+
+/* The narrowest table has no room for a long genre name, so it shows the short one, and the title
+   column is wide enough for a 20-letter word at the smallest type size. */
+@container sheet (max-width: 999px) {
+  .bench thead .c-score {
+    width: 8%;
+  }
+  .bench thead .c-title {
+    width: 22.5%;
+  }
+  .bench thead .c-genre {
+    width: 9%;
+  }
+  .bench thead .c-model {
+    width: 13%;
+  }
+  .bench thead .c-buildTime {
+    width: 10%;
+  }
+  .bench thead .c-agents {
+    width: 8%;
+  }
+  .bench thead .c-tokens {
+    width: 8%;
+  }
+}
+@container sheet (min-width: 860px) and (max-width: 999px) {
+  .genre-full {
+    display: none;
+  }
+  .genre-brief {
+    display: inline;
+  }
+}
+
+/* Phones and narrow tablets: each row becomes a card, and a menu does the sorting. */
+@container sheet (max-width: 859.98px) {
+  /* Heading, sort sentence and menu each keep a row of their own, so nothing moves when bench.js
+     fills in the sentence and the menu. */
+  .sheet-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+  .sheet-title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .sheet-status {
+    min-height: 1.5em;
+  }
+  .sheet-sorter {
+    display: inline-flex;
+    min-height: 48px;
+  }
+  /* Sized so the longest sort name shows in full on a phone. */
+  .sheet-sorter select {
+    padding: 0 40px 0 16px;
+    background-position: right 16px center;
+    font-size: 1rem;
+  }
+  /* The menu is the one sort control here. The header buttons are hidden outright, which also
+     takes them out of the tab order; each value carries its own label. */
+  .bench thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    visibility: hidden;
+  }
+  .bench,
+  .bench tbody {
+    display: block;
+  }
+  .bench tbody tr {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s3) var(--s4);
+    padding: var(--s4) var(--s4) 80px;
+    border-radius: var(--r-lg);
+    background: var(--paper);
+    border-top: 10px solid var(--model);
+  }
+  .bench tbody tr + tr {
+    margin-top: var(--s4);
+  }
+  .bench tbody tr:hover > *,
+  .bench tbody .is-sorted,
+  .bench tbody tr:hover > .is-sorted {
+    background: none;
+  }
+  .bench tbody th,
+  .bench tbody td {
+    display: block;
+    padding: 0;
+    border: 0;
+    text-align: left;
+    white-space: normal;
+    min-width: 0;
+  }
+  .bench tbody td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    overflow-wrap: normal;
+  }
+  /* The value the cards are sorted by is marked, as the shaded column is in the table. */
+  .bench tbody td.is-sorted::before {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .bench tbody .num {
+    text-align: left;
+    white-space: normal;
+  }
+  .bench .c-title {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding-right: 70px;
+  }
+  .row-play {
+    position: absolute;
+    left: var(--s4);
+    bottom: var(--s4);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    height: 48px;
+    padding: 0 22px 0 18px;
+    border-radius: 999px;
+    font-weight: 800;
+  }
+  .row-play:hover {
+    transform: translateY(-2px);
+  }
+  .row-play-label {
+    display: inline;
+    font-size: 1rem;
+  }
+  .bench .c-score {
+    position: absolute;
+    top: 4px;
+    right: 10px;
+    width: auto;
+  }
+  .bench .c-score::before {
+    display: none;
+  }
+  /* The unrated badge takes the same corner as the rating sticker. */
+  .bench .c-score:has(.seal--none) {
+    top: 12px;
+    right: 12px;
+  }
+  .bench .c-score .seal--none {
+    max-width: 70px;
+  }
+  .bench .c-cost {
+    grid-column: 1 / -1;
+  }
+  .bench tbody tr {
+    font-size: 0.9375rem;
+  }
+  /* The title is the way into the details view, so it gets a 44px target. The extra height sits
+     above the text, in the card's top padding. */
+  .game-name a {
+    display: flex;
+    align-items: flex-end;
+    min-height: 44px;
+    margin-top: -12px;
+    padding-bottom: 2px;
+    outline-offset: 0;
+    font-size: clamp(0.75rem, calc(100cqw / var(--word, 8)), 1.0625rem);
+  }
+  .exact {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+  }
+  .exact {
+    display: block;
+    color: var(--ink-soft);
+    font-size: 0.8125rem;
+  }
+  .meter {
+    max-width: 100%;
+  }
+}
+
+/* The narrowest phones: half a card is too narrow for a long genre name without breaking it at its
+   hyphen, so the card shows the short name. */
+@container sheet (max-width: 299px) {
+  .genre-full {
+    display: none;
+  }
+  .genre-brief {
+    display: inline;
+  }
+}
+
+/* The narrowest phones: the bench's sort menu takes a row of its own under its label, which is the
+   width the longest sort name needs. */
+@media (max-width: 359px) {
+  .sheet-sorter {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+  }
+  .sheet-sorter select {
+    width: 100%;
+  }
+}
+
+/* reviews */
+
+.reviews,
+.method {
+  padding-top: var(--s8);
+}
+.reviewer-notes {
+  display: grid;
+  gap: var(--s3);
+  margin-bottom: var(--s6);
+}
+.reviewer-notes li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s2) var(--s4);
+  padding: var(--s4) var(--s5);
+  border-radius: var(--r-md);
+  background: var(--paper-lo);
+  font-weight: 600;
+}
+.reviewer-notes b {
+  font-weight: 800;
+}
+.review-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s6);
+}
+@media (min-width: 1024px) {
+  .review-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.review {
+  --deep: color-mix(in oklab, var(--accent) 72%, #3b1f00);
+  --btn-base: #8d7a5f;
+  display: grid;
+  grid-template-columns: clamp(92px, 22%, 148px) minmax(0, 1fr);
+  border-radius: var(--r-lg);
+  background: var(--paper-hi);
+  box-shadow: 0 8px 0 var(--deep);
+  overflow: hidden;
+}
+/* On paper the Play button goes back to plain ink. */
+.review .btn-play {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper-hi);
+}
+.review-side {
+  --focus: var(--on-accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s4);
+  padding: var(--s5) var(--s3);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.review-side .seal {
+  --size: clamp(64px, 14vw, 84px);
+}
+.review-side .seal--none {
+  white-space: normal;
+  text-align: center;
+  font-size: 0.75rem;
+  border-radius: 14px;
+}
+.review-side img,
+.review-side .blank {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: #15120f;
+}
+.review-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding: clamp(16px, 2.4vw, 28px);
+  min-width: 0;
+  container-type: inline-size;
+}
+.review-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.review-meta .model {
+  color: var(--ink);
+}
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper-hi);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.review-body h3 {
+  max-width: 100%;
+  letter-spacing: -0.03em;
+}
+.review-title {
+  display: block;
+  font-size: clamp(1rem, calc(100cqw / var(--word, 8)), 1.5rem);
+}
+.review-body h3 small {
+  display: block;
+  margin-top: 6px;
+  font: 700 1rem/1.2 var(--text);
+  letter-spacing: 0;
+  color: var(--ink-soft);
+}
+.review-verdict {
+  font-size: var(--step-1);
+  font-weight: 700;
+  line-height: 1.3;
+}
+.review-body .marks {
+  margin-top: var(--s1);
+}
+.review-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s4) var(--s5);
+  margin-top: auto;
+  padding-top: var(--s3);
+}
+.review-links .textlink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+/* method */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: var(--s5);
+  counter-reset: step;
+}
+.steps li {
+  counter-increment: step;
+  padding: var(--s5);
+  border-radius: var(--r-lg);
+  background: var(--paper-lo);
+}
+.steps li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--s4);
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--paper-hi);
+  font: 800 1.125rem/1 var(--display);
+}
+.steps h3 {
+  margin-bottom: var(--s2);
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.steps p {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.method-more {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s7) var(--s8);
+  padding-block: var(--s7) var(--s8);
+}
+@media (min-width: 1000px) {
+  .method-more {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+  .method-more:has(> [hidden]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.method-more h3 {
+  margin-bottom: var(--s4);
+  font-size: 1.25rem;
+}
+.briefs dt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s1) var(--s3);
+  font-weight: 800;
+}
+.briefs dt small {
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.briefs dd {
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.briefs dd + dt {
+  margin-top: var(--s4);
+  padding-top: var(--s4);
+  border-top: 2px solid var(--line);
+}
+.measured-lede {
+  max-width: 68ch;
+  margin-bottom: var(--s4);
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.measures {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: var(--s4);
+}
+.measures li {
+  padding: var(--s4);
+  border-radius: var(--r-md);
+  background: var(--paper-lo);
+}
+.measures h4 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--s3);
+  margin-bottom: var(--s2);
+  font: 800 1.0625rem/1.2 var(--text);
+  overflow-wrap: anywhere;
+}
+.measures h4 small {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.measures h4 .swatch {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+}
+/* A note can hold a web address or a timestamp, which has no place to break: it breaks where the
+   line ends rather than pushing the page sideways. */
+.measures p {
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.measures p + p {
+  margin-top: var(--s2);
+}
+.measures p b {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* ---------- movement off ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .slot:hover .box,
+  .slot:has(:focus-visible) .box {
+    transform: none;
+  }
+}
+
+/* Filter and sort changes slide the boxes to their new places. */
+::view-transition-group(*) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en" data-base="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Games built by AI models, played and rated by Alan Yao</title>
+    <meta
+      name="description"
+      content="Browser games, each built by an AI model from one prompt. Watch a gameplay clip of each, play any of them in your browser, and read Alan Yao's rating out of 10."
+    />
+    <meta name="theme-color" content="#FFF4DF" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href="https://www.alanyao.com/games/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Games built by AI models" />
+    <meta property="og:title" content="Games built by AI models, played and rated by Alan Yao" />
+    <meta
+      property="og:description"
+      content="Browser games, each built by an AI model from one prompt. Watch a gameplay clip of each, play any of them in your browser, and read Alan Yao's rating out of 10."
+    />
+    <meta property="og:url" content="https://www.alanyao.com/games/" />
+    <meta property="og:image" content="https://www.alanyao.com/games/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Three game boxes showing gameplay stills, standing on a shelf." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Games built by AI models, played and rated by Alan Yao" />
+    <meta
+      name="twitter:description"
+      content="Browser games, each built by an AI model from one prompt. Watch a gameplay clip of each, play any of them in your browser, and read Alan Yao's rating out of 10."
+    />
+    <meta name="twitter:image" content="https://www.alanyao.com/games/og.jpg" />
+    <link rel="preload" href="./fonts/unbounded-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./fonts/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./styles.css" />
+    <noscript><style>.reel-wall, .shelf-head, .shelf-wall { display: none; }</style></noscript>
+    <script defer src="./catalog.js"></script>
+    <script defer src="./shared.js"></script>
+    <script defer src="./app.js"></script>
+  </head>
+  <body class="page-catalog">
+    <a class="skip" href="#shelf-title">Skip to the games</a>
+
+    <header class="top wrap">
+      <div class="brand">
+        <a class="mark" href="./" aria-label="Games catalog">
+          <span class="mark-boxes" data-mark aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="mark-word">Games</span>
+        </a>
+        <a class="byline" href="../" data-home hidden>by Alan Yao</a>
+      </div>
+      <nav class="nav" aria-label="Site">
+        <a href="./" aria-current="page">Catalog</a>
+        <a href="./bench/">Bench</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="intro wrap" aria-labelledby="page-title">
+        <h1 id="page-title"><span data-count>These browser games</span>, <span data-each>each built</span> by an AI model from one prompt.</h1>
+        <div class="intro-side">
+          <p>
+            <a class="lede-home" href="../" data-home hidden>Alan Yao</a><span class="lede-name">Alan Yao</span> plays every
+            build and rates it out of 10.<span class="intro-more">
+              Pick one and play it in your browser, or
+              <a class="textlink" href="./bench/">compare the builds on the bench</a>.</span
+            >
+          </p>
+        </div>
+      </section>
+
+      <!-- The empty kiosk holds the hero's place until app.js fills it, so nothing below moves. -->
+      <section class="reel-wall" aria-roledescription="carousel" aria-label="Top rated games">
+        <div class="reel wrap" id="reel">
+          <div class="kiosk">
+            <div class="kiosk-screen"><div class="screen"></div></div>
+            <div class="kiosk-info"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="catalog" aria-labelledby="shelf-title">
+        <div class="shelf-head wrap">
+          <div class="shelf-title">
+            <h2 id="shelf-title" tabindex="-1">The shelf</h2>
+            <p class="shelf-status" id="shelf-status" role="status"></p>
+          </div>
+          <div class="shelf-tools">
+            <div class="chips" id="chips" role="group" aria-label="Filter by genre"></div>
+            <label class="sorter">
+              <span>Sort</span>
+              <select id="sort">
+                <option value="score:desc">Highest rated</option>
+                <option value="title:asc">Title, A to Z</option>
+                <option value="genre:asc">Genre</option>
+                <option value="buildTime:asc">Shortest build</option>
+                <option value="cost:asc">Lowest cost</option>
+              </select>
+            </label>
+          </div>
+          <div class="legend" id="legend" hidden>
+            <p class="legend-label" id="legend-label">Built by</p>
+            <div class="chips chips--model" id="model-chips" role="group" aria-labelledby="legend-label" aria-describedby="legend-note"></div>
+            <p class="legend-note" id="legend-note">The colour on each shelf label shows the model.</p>
+          </div>
+        </div>
+        <div class="shelf-wall">
+          <ul class="shelf wrap" id="shelf"></ul>
+        </div>
+        <noscript><p class="wrap noscript">This page needs JavaScript to show the games.</p></noscript>
+      </section>
+
+      <section class="about wrap" aria-labelledby="about-title">
+        <div class="about-card">
+          <div>
+            <h2 id="about-title">What this is</h2>
+            <p>
+              Each game here was built by an AI model from one prompt. Every build is hosted, so you can play it.
+              Alan plays each one and rates it out of 10.
+            </p>
+            <a class="textlink" href="./bench/">See rating, build time, tokens and cost on the bench</a>
+          </div>
+          <ul class="tally" id="tally" aria-label="The catalog in numbers"></ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot wrap">
+      <p>Built by AI models. Played and rated by Alan Yao.</p>
+      <nav aria-label="Footer">
+        <a href="./">Catalog</a>
+        <a href="./bench/">Bench</a>
+        <a href="../" data-home hidden>alanyao.com</a>
+      </nav>
+    </footer>
+
+    <dialog class="back" id="detail" aria-labelledby="detail-title"></dialog>
+  </body>
+</html>

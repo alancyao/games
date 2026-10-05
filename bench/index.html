@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en" data-base="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The bench: games built by AI models, compared</title>
+    <meta
+      name="description"
+      content="Every AI-built game in one sortable table: Alan Yao's rating out of 10, the model, effort, build time, agents, tokens and cost as a list-price equivalent."
+    />
+    <meta name="theme-color" content="#FFF4DF" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href="https://www.alanyao.com/games/bench/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Games built by AI models" />
+    <meta property="og:title" content="The bench: games built by AI models, compared" />
+    <meta
+      property="og:description"
+      content="Every AI-built game in one sortable table: Alan Yao's rating out of 10, the model, effort, build time, agents, tokens and cost as a list-price equivalent."
+    />
+    <meta property="og:url" content="https://www.alanyao.com/games/bench/" />
+    <meta property="og:image" content="https://www.alanyao.com/games/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Three game boxes showing gameplay stills, standing on a shelf." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The bench: games built by AI models, compared" />
+    <meta
+      name="twitter:description"
+      content="Every AI-built game in one sortable table: Alan Yao's rating out of 10, the model, effort, build time, agents, tokens and cost as a list-price equivalent."
+    />
+    <meta name="twitter:image" content="https://www.alanyao.com/games/og.jpg" />
+    <link rel="preload" href="../fonts/unbounded-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="../fonts/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="../styles.css" />
+    <!-- Without JavaScript the measurement notes are not there, so the sentence that points to them
+         goes too, and Method keeps the space below it that the notes would have given it. -->
+    <noscript><style>.sheet, .strip, .reviews, .method-more, .notes-pointer { display: none; } .method { padding-bottom: var(--s8); }</style></noscript>
+    <script defer src="../catalog.js"></script>
+    <script defer src="../shared.js"></script>
+    <script defer src="./bench.js"></script>
+  </head>
+  <body class="page-bench">
+    <a class="skip" href="#table-title">Skip to the table</a>
+
+    <header class="top wrap">
+      <div class="brand">
+        <a class="mark" href="../" aria-label="Games catalog">
+          <span class="mark-boxes" data-mark aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="mark-word">Games</span>
+        </a>
+        <a class="byline" href="../../" data-home hidden>by Alan Yao</a>
+      </div>
+      <nav class="nav" aria-label="Site">
+        <a href="../">Catalog</a>
+        <a href="./" aria-current="page">Bench</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="intro wrap" aria-labelledby="bench-title">
+        <h1 id="bench-title">The bench</h1>
+        <div class="intro-side">
+          <p>
+            The games from the catalog as a comparison: what Alan rated each build, which model built it, and what the
+            build took.
+          </p>
+        </div>
+      </section>
+
+      <section class="wrap" aria-labelledby="table-title">
+        <ul class="strip" id="strip" aria-label="The bench in numbers"></ul>
+        <div class="sheet">
+          <div class="sheet-head">
+            <div class="sheet-title">
+              <h2 id="table-title" tabindex="-1">All builds</h2>
+              <p class="sheet-status" id="sort-status" role="status"></p>
+            </div>
+            <label class="sorter sheet-sorter">
+              <span>Sort</span>
+              <select id="bench-sort"></select>
+            </label>
+          </div>
+          <div class="key" id="key" hidden>
+            <p id="key-label">Bar colour shows the model</p>
+            <ul id="bench-legend" aria-labelledby="key-label"></ul>
+          </div>
+          <table class="bench" id="bench" aria-labelledby="table-title" aria-describedby="table-note">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+          <p class="sheet-note" id="table-note">
+            Costs are list-price equivalents at published API rates; Method names the rates used for each build.
+            Each bar compares a figure with the largest in its column. Token counts are rounded to three figures;
+            the exact count is in each game's details. A dash means no figure is listed.
+          </p>
+        </div>
+        <noscript><p class="noscript">This page needs JavaScript to show the table.</p></noscript>
+      </section>
+
+      <section class="reviews wrap" aria-labelledby="reviews-title">
+        <div class="section-head">
+          <h2 id="reviews-title">Alan's reviews</h2>
+          <p>What Alan wrote after playing each build, highest rated first.</p>
+        </div>
+        <ul class="reviewer-notes" id="reviewer-notes"></ul>
+        <ol class="review-list" id="reviews"></ol>
+      </section>
+
+      <section class="method wrap" aria-labelledby="method-title">
+        <div class="section-head">
+          <h2 id="method-title">Method</h2>
+        </div>
+        <ol class="steps">
+          <li>
+            <h3>One prompt per build</h3>
+            <p>Each model gets one prompt and builds the whole game from it.</p>
+          </li>
+          <li>
+            <h3>Every build is playable</h3>
+            <p>Every build is hosted. You can play any of them from the catalog.</p>
+          </li>
+          <li>
+            <h3>Alan plays and rates</h3>
+            <p>Alan plays each build and rates it out of 10.</p>
+          </li>
+          <li>
+            <h3>Costs are <span class="nowrap">list-price</span> equivalents</h3>
+            <p>
+              Each cost is a list-price equivalent at published API rates.
+              <span class="notes-pointer" id="notes-pointer">The notes below name the rates used for each build.</span>
+            </p>
+          </li>
+        </ol>
+        <div class="method-more">
+          <div>
+            <h3>The briefs</h3>
+            <dl class="briefs" id="briefs"></dl>
+          </div>
+          <div class="measured">
+            <h3>How each figure was measured</h3>
+            <p class="measured-lede">
+              Effort is the effort setting the model ran at, named the way its own tool names it. Agents is the
+              number of agents the build's main session started to do parts of the work. Build time and cost are
+              measured for each build as noted here.
+            </p>
+            <ul class="measures" id="measures"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot wrap">
+      <p>Built by AI models. Played and rated by Alan Yao.</p>
+      <nav aria-label="Footer">
+        <a href="../">Catalog</a>
+        <a href="./">Bench</a>
+        <a href="../../" data-home hidden>alanyao.com</a>
+      </nav>
+    </footer>
+  </body>
+</html>
