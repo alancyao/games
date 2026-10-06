@@ -342,15 +342,15 @@ window.CATALOG = {
       "verdict": "",
       "review": "",
       "highlights": [],
-      "buildTime": "46h 16m",
-      "agents": 160,
-      "tokens": 4988094172,
-      "cost": 3550.87,
-      "costLabel": "$3,550.87 list-price equivalent",
+      "buildTime": "49h 48m",
+      "agents": 166,
+      "tokens": 5213342501,
+      "cost": 3720.61,
+      "costLabel": "$3,720.61 list-price equivalent",
       "rates": "Claude Fable 5.1",
       "notes": {
-        "build": "Wall clock from the task prompt to release, leaving out about 22 hours in which the build session was down: 46h 16m. The orchestrating session ran 19 agent workflows with 160 agents.",
-        "cost": "At Claude Fable 5.1 standard API list rates ($10 input, $12.50 cache write, $0.25 cache read and $50 output per million tokens) for 14,518 API messages: the orchestrating session plus 160 agents. Image generation for the game's pictures is not counted."
+        "build": "Wall clock from the task prompt to release, leaving out about 37 hours in which nothing ran (the build session was down, or the finished build was waiting to be played): 49h 48m. The orchestrating session ran 20 agent workflows with 166 agents.",
+        "cost": "At Claude Fable 5.1 standard API list rates ($10 input, $12.50 cache write, $0.25 cache read and $50 output per million tokens) for 15,253 API messages: the orchestrating session plus 166 agents. Image generation for the game's pictures and a wording pass by two other models are not counted."
       },
       "accent": "#3fd6d0",
       "url": "./mainline/",
