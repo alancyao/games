@@ -404,15 +404,15 @@ window.CATALOG = {
       "verdict": "",
       "review": "",
       "highlights": [],
-      "buildTime": "16h 14m",
-      "agents": 110,
-      "tokens": 1867623081,
-      "cost": 1820.67,
-      "costLabel": "$1,820.67 list-price equivalent",
+      "buildTime": "18h 24m",
+      "agents": 115,
+      "tokens": 1929360683,
+      "cost": 1891.12,
+      "costLabel": "$1,891.12 list-price equivalent",
       "rates": "Claude Fable 5.1",
       "notes": {
-        "build": "Build time to this fifth release candidate: 16h 14m of wall clock, in two spans, with the idle hours between them left out. The orchestrating session wrote the brief, the design and the contracts and ran 31 agent workflows with 110 agent runs, including four playtest rounds by real input, a fact-checked truth audit and twelve fix waves. The last of those waves answered the notes of the first person to play it.",
-        "cost": "At Claude Fable 5.1 standard API list rates ($10 input, $12.50 cache write, $0.25 cache read and $50 output per million tokens) for 10,616 API messages: the orchestrating session plus 110 agent runs. Image generation for the game's pictures and two short editing passes by another model are not counted."
+        "build": "Build time to this sixth release candidate: 18h 24m of wall clock, in two spans, with the idle hours between them left out. The orchestrating session wrote the brief, the design and the contracts and ran 34 agent workflows with 115 agent runs, including four playtest rounds by real input, a fact-checked truth audit and thirteen fix waves. The last of those waves answered the notes of the first person to play it.",
+        "cost": "At Claude Fable 5.1 standard API list rates ($10 input, $12.50 cache write, $0.25 cache read and $50 output per million tokens) for 10,936 API messages: the orchestrating session plus 115 agent runs. Image generation for the game's pictures and two short editing passes by another model are not counted."
       },
       "accent": "#c8963e",
       "url": "./rubber-stamp/",
