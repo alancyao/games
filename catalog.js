@@ -27,6 +27,12 @@ window.CATALOG = {
       "name": "Factory builder",
       "short": "Factory",
       "brief": "Build a small Factorio-like factory-management game with defense, in which the factory is a software factory run by AI agents and play teaches its building blocks."
+    },
+    {
+      "id": "deckbuilder",
+      "name": "Deckbuilder",
+      "short": "Deckbuilder",
+      "brief": "Build a polished browser deckbuilder that teaches context engineering for AI agents through play: you pack what the agent carries, and it goes in alone."
     }
   ],
   "games": [
@@ -346,6 +352,37 @@ window.CATALOG = {
         "poster": "./media/mainline.jpg",
         "webm": "./media/mainline.webm",
         "mp4": "./media/mainline.mp4"
+      }
+    },
+    {
+      "id": "satchel",
+      "title": "Satchel",
+      "subtitle": "Pack the satchel. Wick walks alone.",
+      "genre": "deckbuilder",
+      "pitch": "Pack a satchel of pages for a brass courier who walks the valley alone, and find out why the right page under twenty others is as good as missing.",
+      "controls": "Mouse",
+      "model": "Claude Fable 5.x",
+      "effort": "ultracode",
+      "score": null,
+      "verdict": "",
+      "review": "",
+      "highlights": [],
+      "buildTime": "12h 35m",
+      "agents": 73,
+      "tokens": 1109927336,
+      "cost": 1054.77,
+      "costLabel": "$1,054.77 list-price equivalent",
+      "rates": "Claude Fable 5.1",
+      "notes": {
+        "build": "Wall clock from the task prompt to this release candidate: 12h 35m. The orchestrating session wrote the rules and the contracts and ran 12 agent workflows with 73 agents, including three rounds of cold playtests by archetype and four waves of changes from their findings. A first playable candidate was published 2h 30m after the task prompt.",
+        "cost": "At Claude Fable 5.1 standard API list rates ($10 input, $12.50 cache write, $0.25 cache read and $50 output per million tokens) for 5,844 API messages: the orchestrating session plus 73 agents. Image generation for the game's pictures is not counted."
+      },
+      "accent": "#e9b44c",
+      "url": "./satchel/",
+      "media": {
+        "poster": "./media/satchel.jpg",
+        "webm": "./media/satchel.webm",
+        "mp4": "./media/satchel.mp4"
       }
     }
   ]
