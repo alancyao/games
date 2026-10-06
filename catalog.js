@@ -33,6 +33,12 @@ window.CATALOG = {
       "name": "Deckbuilder",
       "short": "Deckbuilder",
       "brief": "Build a polished browser deckbuilder that teaches context engineering for AI agents through play: you pack what the agent carries, and it goes in alone."
+    },
+    {
+      "id": "desk",
+      "name": "Inspection desk",
+      "short": "Desk",
+      "brief": "Build a polished browser inspection-desk game that teaches evals for AI agents through play: you sign off on agents' work, and the morning says what it was."
     }
   ],
   "games": [
@@ -383,6 +389,37 @@ window.CATALOG = {
         "poster": "./media/satchel.jpg",
         "webm": "./media/satchel.webm",
         "mp4": "./media/satchel.mp4"
+      }
+    },
+    {
+      "id": "rubber-stamp",
+      "title": "Rubber Stamp",
+      "subtitle": "You sign off. The morning says what it was.",
+      "genre": "desk",
+      "pitch": "Sign off on AI agents' work at a night desk: read each agent's tape, hand your stamp to a machine of check plates, and find out each morning what your checks let through.",
+      "controls": "Mouse and keyboard",
+      "model": "Claude Fable 5.x",
+      "effort": "ultracode",
+      "score": null,
+      "verdict": "",
+      "review": "",
+      "highlights": [],
+      "buildTime": "13h 27m",
+      "agents": 94,
+      "tokens": 1695434198,
+      "cost": 1646.28,
+      "costLabel": "$1,646.28 list-price equivalent",
+      "rates": "Claude Fable 5.1",
+      "notes": {
+        "build": "Wall clock from the task prompt to this fourth release candidate: 13h 27m. The orchestrating session wrote the brief, the design and the contracts and ran 25 agent workflows with 94 agent runs, including four playtest rounds by real input, a fact-checked truth audit and eight fix waves.",
+        "cost": "At Claude Fable 5.1 standard API list rates ($10 input, $12.50 cache write, $0.25 cache read and $50 output per million tokens) for 9,440 API messages: the orchestrating session plus 94 agent runs. Image generation for the game's pictures is not counted."
+      },
+      "accent": "#c8963e",
+      "url": "./rubber-stamp/",
+      "media": {
+        "poster": "./media/rubber-stamp.jpg",
+        "webm": "./media/rubber-stamp.webm",
+        "mp4": "./media/rubber-stamp.mp4"
       }
     }
   ]
