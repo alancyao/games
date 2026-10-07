@@ -132,15 +132,15 @@ window.CATALOG = {
         "Small",
         "Looks primitive next to modern FPS games"
       ],
-      "buildTime": "36h 7m",
-      "agents": 197,
-      "tokens": 9349363234,
-      "cost": 6336.78,
-      "costLabel": "$6,336.78 list-price equivalent",
+      "buildTime": "40h 32m",
+      "agents": 211,
+      "tokens": 9803804177,
+      "cost": 6737.48,
+      "costLabel": "$6,737.48 list-price equivalent",
       "rates": "Claude Fable 5.1",
       "notes": {
-        "build": "Wall clock from the task prompt to release: 36h 7m 15s. The orchestrating session ran 16 agent workflows with 197 agent runs.",
-        "cost": "At Claude Fable 5.1 standard API list rates ($10 input, $12.50 cache write, $0.25 cache read and $50 output per million tokens) for 24,470 API messages: the orchestrating session plus 197 agent runs. Image generation for textures and interface art is not counted."
+        "build": "Wall clock from the task prompt to the first release, 36h 7m 15s, plus 4h 25m 23s for two changes asked for after the first playthrough (the stand-in sound for speech removed; black tiles on Apple GPUs fixed): 40h 32m 38s. The days in which the finished build was waiting to be played are left out. The orchestrating sessions ran 18 agent workflows with 211 agent runs.",
+        "cost": "At Claude Fable 5.1 standard API list rates ($10 input, $12.50 cache write, $0.25 cache read and $50 output per million tokens) for 26,100 API messages: the orchestrating sessions plus 211 agent runs. Image generation for textures and interface art is not counted."
       },
       "accent": "#a9b9cc",
       "url": "./cordite/",
